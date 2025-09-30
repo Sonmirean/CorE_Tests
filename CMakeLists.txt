@@ -33,4 +33,10 @@ message("${CMAKE_PREFIX_PATH}")
 
 find_package(CorEngine REQUIRED)
 
-target_link_libraries(CorE_Tests PUBLIC CorE::CorEngine)
+target_link_libraries(
+	CorE_Tests 
+	PUBLIC 
+	
+	Vulkan::Vulkan 
+	CorE::CorEngine
+)

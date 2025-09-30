@@ -1,4 +1,7 @@
-﻿#define CORENGINE_USE_PLATFORM_WIN32
+﻿
+#include <chrono>
+
+#define CORENGINE_USE_PLATFORM_WIN32
 #include "CorE/auxiliary/corengine.hpp"
 
 #include "CorE/auxiliary/debug.hpp"
@@ -12,6 +15,8 @@ using namespace std;
 struct Herz : CorE::Heart
 {
 public:
+
+	static inline VkInstance test_instance{};
 
 	using Heart::Heart;
 
@@ -65,16 +70,78 @@ public:
 	HWND hwnd;
 };
 
-
+using namespace std;
+using namespace CorE;
 
 int main()
 {
 
+	VkInstance test_instance_0;
+
 	const char appname[] = "appname";
 	uint32_t vers[4] = { 0, 1, 2, 3 };
+	const char* appref = &appname[0];
 
-	CorE::Application::initVulkan(&appname[0], vers);
+	VkAllocationCallbacks* kabaks = nullptr;
 
-	CorE::math::Vec3 vec = { 1,2,3 };
+	 
+	/// try to manually create valid instance info
+	const VkApplicationInfo const_application_info
+	{
+		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+		.pApplicationName = &appname[0],
+		.applicationVersion = VK_MAKE_API_VERSION(vers[0], vers[1], vers[2], vers[3]),
+		.pEngineName = "CorEngine",
+		.engineVersion = VK_MAKE_API_VERSION(CORENGINE_VERSION_MAJOR, CORENGINE_VERSION_MINOR, CORENGINE_VERSION_PATCH, CORENGINE_VERSION_BUILD),
+		.apiVersion = VK_API_VERSION_1_0
+	};
+
+	VkApplicationInfo test_application_info;
+	test_application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	test_application_info.pApplicationName = &appname[0];
+	test_application_info.applicationVersion = VK_MAKE_API_VERSION(vers[0], vers[1], vers[2], vers[3]);
+	test_application_info.pEngineName = "CorEngine";
+	test_application_info.engineVersion = VK_MAKE_API_VERSION(CORENGINE_VERSION_MAJOR, CORENGINE_VERSION_MINOR, CORENGINE_VERSION_PATCH, CORENGINE_VERSION_BUILD),
+	test_application_info.apiVersion = VK_API_VERSION_1_0;
+	
+
+	VkInstanceCreateInfo test_instance_create_info;
+	test_instance_create_info.enabledExtensionCount = 0;
+	test_instance_create_info.enabledLayerCount = 0;
+	test_instance_create_info.flags = 0;
+	test_instance_create_info.pApplicationInfo = &TESTS::testAppInfoCreation(&appname[0], vers);
+	test_instance_create_info.pNext = nullptr;
+	test_instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	test_instance_create_info.ppEnabledLayerNames = nullptr;
+	test_instance_create_info.ppEnabledExtensionNames = nullptr;
+	
+	//ensureVkSuccess(vkCreateInstance(&test_instance_create_info, nullptr, &test_instance_0));
+	// YES! It works. ^^^
+	///
+//
+
+/// the issue is something to deal with const operator.
+	/// But I'm not sure
+
+
+	// vvv fails vvv
+	ensureVkSuccess(vkCreateInstance(TESTS::testInstanceInfoCreation(&test_application_info), nullptr, &test_instance_0));
+	
+
+
+	int* pa = nullptr;
+	bool* pb = nullptr;
+	VkInstance* pc = nullptr;
+
+	cout << &Application::instance << "\n";
+	Application::instance = nullptr;
+	cout << &Application::instance << "\n";
+	cout << nullptr << "\n";
+	cout << pa << "\n";
+	cout << pb << "\n";
+	cout << pc << "\n";
+	cout << &Herz::test_instance << "\n";
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 	return 0;
 }
