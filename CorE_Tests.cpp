@@ -115,7 +115,7 @@ int main()
 	test_instance_create_info.ppEnabledLayerNames = nullptr;
 	test_instance_create_info.ppEnabledExtensionNames = nullptr;
 	
-	//ensureVkSuccess(vkCreateInstance(&test_instance_create_info, nullptr, &test_instance_0));
+	ensureVkSuccess(vkCreateInstance(&test_instance_create_info, nullptr, &test_instance_0));
 	// YES! It works. ^^^
 	///
 //
@@ -123,9 +123,37 @@ int main()
 /// the issue is something to deal with const operator.
 	/// But I'm not sure
 
+	VkInstanceCreateInfo info = TESTS::testInstanceInfoCreation(&test_application_info);
+
+	bool _0 = info.enabledExtensionCount == test_instance_create_info.enabledExtensionCount;
+	bool _1 = info.enabledLayerCount == test_instance_create_info.enabledLayerCount;
+	bool _2 = info.flags == test_instance_create_info.flags;
+	bool _3 = info.pApplicationInfo == test_instance_create_info.pApplicationInfo;
+	bool _4 = info.pNext == test_instance_create_info.pNext;///////
+	bool _5 = info.ppEnabledExtensionNames == test_instance_create_info.ppEnabledExtensionNames;
+	bool _6 = info.ppEnabledLayerNames == test_instance_create_info.ppEnabledLayerNames;
+	bool _7 = info.sType == test_instance_create_info.sType;
+
+	cout << _0 << "\n"
+		<< _1 << "\n"
+		<< _2 << "\n"
+		<< _3 << "\n"
+		<< _4 << "\n"
+		<< _5 << "\n"
+		<< _6 << "\n"
+		<< _7 << "\n \n \n";
+
+	cout << info.pNext << "\n"
+		<< test_instance_create_info.pNext << "\n \n \n";
+	// nullptr != nullptr
+
+	printf("instance info ptrs\n");
+	cout << &info << "\n"
+		<< &test_instance_create_info << "\n \n \n";
+	/// just normal pointers
 
 	// vvv fails vvv
-	ensureVkSuccess(vkCreateInstance(TESTS::testInstanceInfoCreation(&test_application_info), nullptr, &test_instance_0));
+	ensureVkSuccess(vkCreateInstance(&TESTS::testInstanceInfoCreation(&test_application_info), nullptr, &test_instance_0));
 	
 
 
